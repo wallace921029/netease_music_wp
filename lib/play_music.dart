@@ -114,7 +114,6 @@ class _PlayMusicState extends State<PlayMusic>
     });
     await audioPlayer.setUrl(songUrl);
     int duration = await audioPlayer.getDuration();
-    print('duration: $duration');
     var minutes = new Duration(milliseconds: duration).inMinutes < 10
         ? '0' + new Duration(milliseconds: duration).inMinutes.toString()
         : new Duration(milliseconds: duration).inMinutes.toString();
