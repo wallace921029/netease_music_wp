@@ -19,7 +19,6 @@ class _PlayMusicState extends State<PlayMusic>
     with SingleTickerProviderStateMixin {
   String name = '';
   String albumPictureUrl;
-  String songUrl;
   int songDurationValue;
   String songDurationString = '00:00';
   Duration currentDuration;
@@ -54,9 +53,27 @@ class _PlayMusicState extends State<PlayMusic>
       });
     });
 
-    audioPlayer.onPlayerStateChanged.listen((state) {
+    audioPlayer.onPlayerStateChanged.listen((state) async {
       switch (state) {
         case AudioPlayerState.PLAYING:
+          if (songDurationValue == null) {
+            int duration = await audioPlayer.getDuration();
+            var minutes = new Duration(milliseconds: duration).inMinutes < 10
+                ? '0' +
+                    new Duration(milliseconds: duration).inMinutes.toString()
+                : new Duration(milliseconds: duration).inMinutes.toString();
+            var seconds =
+                new Duration(milliseconds: duration).inSeconds % 60 < 10
+                    ? '0' +
+                        (new Duration(milliseconds: duration).inSeconds % 60)
+                            .toString()
+                    : (new Duration(milliseconds: duration).inSeconds % 60)
+                        .toString();
+            setState(() {
+              songDurationValue = duration;
+              songDurationString = '$minutes:$seconds';
+            });
+          }
           _animationController.repeat(min: 0.0, max: 1.0, reverse: false);
           setState(() {
             controllerButton = new IconButton(
@@ -109,23 +126,11 @@ class _PlayMusicState extends State<PlayMusic>
     Response response =
         await http.get('${MyUrl.prefix}/song/url?id=${widget.id}');
     Map<String, dynamic> res = json.decode(response.body);
-    setState(() {
-      songUrl = res['data'][0]['url'];
-    });
+    var songUrl = res['data'][0]['url'];
     await audioPlayer.setUrl(songUrl);
-    int duration = await audioPlayer.getDuration();
-    var minutes = new Duration(milliseconds: duration).inMinutes < 10
-        ? '0' + new Duration(milliseconds: duration).inMinutes.toString()
-        : new Duration(milliseconds: duration).inMinutes.toString();
-    var seconds = new Duration(milliseconds: duration).inSeconds % 60 < 10
-        ? '0' + (new Duration(milliseconds: duration).inSeconds % 60).toString()
-        : (new Duration(milliseconds: duration).inSeconds % 60).toString();
-    setState(() {
-      songDurationValue = duration;
-      songDurationString = '$minutes:$seconds';
+    Future.delayed(new Duration(milliseconds: 1000)).then((_){
+      audioPlayer.resume();
     });
-
-    audioPlayer.resume();
   }
 
   getLyrics() async {
@@ -135,19 +140,17 @@ class _PlayMusicState extends State<PlayMusic>
 
     List<String> lyrics = lyric.split('\n');
     List<Text> _lyricsList = [];
-    lyrics.forEach((item){
+    lyrics.forEach((item) {
       if (item.isNotEmpty) {
         item = item.replaceRange(0, 11, '');
       }
-      _lyricsList.add(new Text(item, textAlign: TextAlign.center, style: new TextStyle(fontSize: 14.0, color: Colors.grey)));
+      _lyricsList.add(new Text(item,
+          textAlign: TextAlign.center,
+          style: new TextStyle(fontSize: 14.0, color: Colors.grey)));
     });
     setState(() {
       lyricsList = _lyricsList;
     });
-  }
-
-  playMusic() async {
-    await audioPlayer.resume();
   }
 
   @override
