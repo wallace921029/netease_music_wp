@@ -46,9 +46,11 @@ class _HotListState extends State<HotList> {
         )
       ],
     );
-    setState(() {
-      list.add(stack);      
-    });
+    if (mounted) {
+      setState(() {
+        list.add(stack);      
+      });
+    }
 
     for(var i = 0; i < res['playlist']['tracks'].length; i++) {
       var id = res['playlist']['tracks'][i]['id'];
@@ -79,10 +81,12 @@ class _HotListState extends State<HotList> {
         )
       );
       var listTile = new ListSongItem(id: id, name: name, description: description, artist: artist, album: album, leading: leading);
-      setState(() {
-        list.add(listTile);
-        list.add(new Divider(height: 0));
-      });
+      if (mounted) {
+        setState(() {
+          list.add(listTile);
+          list.add(new Divider(height: 0));
+        });
+      }
     }
   }
 

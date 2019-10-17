@@ -137,13 +137,16 @@ class _PlayMusicState extends State<PlayMusic>
     Response response = await http.get('${MyUrl.prefix}/lyric?id=${widget.id}');
     Map<String, dynamic> res = json.decode(response.body);
     var lyric = res['lrc']['lyric'];
-
     List<String> lyrics = lyric.split('\n');
     List<Text> _lyricsList = [];
     lyrics.forEach((item) {
-      if (item.isNotEmpty) {
-        item = item.replaceRange(0, 11, '');
+      print('before: $item');
+      var end = item.indexOf(']');
+      print('___end: $end');
+      if (end > 0) {
+        item = item.replaceRange(0, end + 1, '');
       }
+      print('_after: $item');
       _lyricsList.add(new Text(item,
           textAlign: TextAlign.center,
           style: new TextStyle(fontSize: 14.0, color: Colors.grey)));
