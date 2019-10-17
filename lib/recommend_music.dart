@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:netease_music_wp/color.dart';
 import 'package:netease_music_wp/list_song_item.dart';
 import 'package:netease_music_wp/my_url.dart';
+import 'package:netease_music_wp/song_list.dart';
 
 class RecommendMusic extends StatefulWidget {
   RecommendMusic({Key key}) : super(key: key);
@@ -35,17 +36,24 @@ class _RecommendMusicState extends State<RecommendMusic> {
               if (snapshot.connectionState == ConnectionState.done) {
                 Map<String, dynamic> res = json.decode(snapshot.data.body);
                 res['result'].forEach((item) {
-                  var album = new Container(
-                    width: MediaQuery.of(context).size.width / 3 - (4 / 3),
-                    child: new Column(
-                      children: <Widget>[
-                        new Image.network(item['picUrl']),
-                        new Text(item['name'],
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 2,
-                            style: new TextStyle(fontSize: 12.0))
-                      ],
-                    ),
+                  var album = new GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).push(new MaterialPageRoute(
+                        builder: (buildContext) => new SongList(id: item['id']),
+                      ));
+                    },
+                    child: new Container(
+                      width: MediaQuery.of(context).size.width / 3 - (4 / 3),
+                      child: new Column(
+                        children: <Widget>[
+                          new Image.network(item['picUrl']),
+                          new Text(item['name'],
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 2,
+                              style: new TextStyle(fontSize: 12.0))
+                        ],
+                      ),
+                    )
                   );
                   list.add(album);
                 });
