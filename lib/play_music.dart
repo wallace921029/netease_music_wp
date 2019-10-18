@@ -59,43 +59,44 @@ class _PlayMusicState extends State<PlayMusic>
           if (songDurationValue == null) {
             int duration = await audioPlayer.getDuration();
             var minutes = new Duration(milliseconds: duration).inMinutes < 10
-                ? '0' +
-                    new Duration(milliseconds: duration).inMinutes.toString()
+                ? '0' + new Duration(milliseconds: duration).inMinutes.toString()
                 : new Duration(milliseconds: duration).inMinutes.toString();
-            var seconds =
-                new Duration(milliseconds: duration).inSeconds % 60 < 10
-                    ? '0' +
-                        (new Duration(milliseconds: duration).inSeconds % 60)
-                            .toString()
-                    : (new Duration(milliseconds: duration).inSeconds % 60)
-                        .toString();
-            setState(() {
-              songDurationValue = duration;
-              songDurationString = '$minutes:$seconds';
-            });
+            var seconds = new Duration(milliseconds: duration).inSeconds % 60 < 10
+                ? '0' + (new Duration(milliseconds: duration).inSeconds % 60).toString()
+                : (new Duration(milliseconds: duration).inSeconds % 60).toString();
+            if (mounted) {
+              setState(() {
+                songDurationValue = duration;
+                songDurationString = '$minutes:$seconds';
+              });
+            }
           }
           _animationController.repeat(min: 0.0, max: 1.0, reverse: false);
-          setState(() {
-            controllerButton = new IconButton(
-              icon: new Icon(Icons.pause),
-              iconSize: 40,
-              onPressed: () {
-                audioPlayer.pause();
-              },
-            );
-          });
+          if (mounted) {
+            setState(() {
+              controllerButton = new IconButton(
+                icon: new Icon(Icons.pause),
+                iconSize: 40,
+                onPressed: () {
+                  audioPlayer.pause();
+                },
+              );
+            });
+          }
           break;
         default:
           _animationController.stop();
-          setState(() {
-            controllerButton = new IconButton(
-              icon: new Icon(Icons.play_arrow),
-              iconSize: 40,
-              onPressed: () {
-                audioPlayer.resume();
-              },
-            );
-          });
+          if (mounted) {
+            setState(() {
+              controllerButton = new IconButton(
+                icon: new Icon(Icons.play_arrow),
+                iconSize: 40,
+                onPressed: () {
+                  audioPlayer.resume();
+                },
+              );
+            });
+          }
           break;
       }
     });
@@ -140,13 +141,10 @@ class _PlayMusicState extends State<PlayMusic>
     List<String> lyrics = lyric.split('\n');
     List<Text> _lyricsList = [];
     lyrics.forEach((item) {
-      print('before: $item');
       var end = item.indexOf(']');
-      print('___end: $end');
       if (end > 0) {
         item = item.replaceRange(0, end + 1, '');
       }
-      print('_after: $item');
       _lyricsList.add(new Text(item,
           textAlign: TextAlign.center,
           style: new TextStyle(fontSize: 14.0, color: Colors.grey)));

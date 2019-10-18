@@ -170,9 +170,6 @@ class _SearchPageState extends State<SearchPage> {
 
   List<Widget> generateSongList() {
     List<Widget> list = [];
-    if (songs.length == 0) {
-      list.add(new Text('未查询到相关曲目'));
-    }
     songs.forEach((item) {
       var id = item['id'];
       var name = item['name'];
